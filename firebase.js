@@ -12,6 +12,7 @@ import {
   collection,
   doc,
   setDoc,
+ updateDoc,
   getDoc,
   getDocs,
   addDoc,
@@ -40,5 +41,5 @@ export {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  collection, doc, setDoc, getDoc, getDocs, addDoc, query, where, serverTimestamp
+  collection, doc, setDoc, updateDoc, getDoc, getDocs, addDoc, query, where, serverTimestamp
 };
