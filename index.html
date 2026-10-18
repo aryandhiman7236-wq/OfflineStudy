@@ -76,5 +76,5 @@ function net(){let online=navigator.onLine;$('netlabel').textContent=online?'Onl
 $('today').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 (async()=>{try{db=await openDB();await refresh();net();if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(()=>{});try{if(localStorage.getItem('study-vault-streak-date')!==new Date().toDateString()){let n=Number(localStorage.getItem('study-vault-streak')||0)+1;localStorage.setItem('study-vault-streak',n);localStorage.setItem('study-vault-streak-date',new Date().toDateString())}$('streak').textContent=localStorage.getItem('study-vault-streak')+' days'}catch{}}catch(e){toast('Vault could not start: '+e.message)}})();
 </script>
-  <script type="module" src="./dashboard.js"></script>
+ <script type="module" src="./dashboard.js"></script>
 </body></html>
