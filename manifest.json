@@ -1,0 +1,10 @@
+{
+  "name": "Study Vault — Offline Study Space",
+  "short_name": "Study Vault",
+  "description": "Save study files locally and open them offline.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f7fb",
+  "theme_color": "#f7f8fc"
+}
