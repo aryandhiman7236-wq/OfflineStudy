@@ -1,58 +1,77 @@
 
-const CACHE = "study-vault-shell-v1";
+const CACHE_NAME = "study-vault-offline-v2";
+const BASE_URL = self.registration.scope;
 
-const FILES = [
-  "./",
-  "./index.html",
-  "./manifest.json"
-];
-
-self.addEventListener("install", event => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE)
-      .then(cache => cache.addAll(FILES))
-      .then(() => self.skipWaiting())
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+
+      await cache.addAll([
+        BASE_URL,
+        BASE_URL + "index.html",
+        BASE_URL + "manifest.json"
+      ]);
+
+      await self.skipWaiting();
+    })()
   );
 });
 
-self.addEventListener("activate", event => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
+    (async () => {
+      const keys = await caches.keys();
+
+      await Promise.all(
         keys
-          .filter(k =>
-            k.startsWith("study-vault-shell-") &&
-            k !== CACHE
+          .filter((key) =>
+            key.startsWith("study-vault-offline-") &&
+            key !== CACHE_NAME
           )
-          .map(k => caches.delete(k))
-      ))
-      .then(() => self.clients.claim())
+          .map((key) => caches.delete(key))
+      );
+
+      await self.clients.claim();
+    })()
   );
 });
 
-self.addEventListener("fetch", event => {
-  const req = event.request;
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
 
-  if (req.method !== "GET") return;
+  if (request.method !== "GET") return;
 
-  const url = new URL(req.url);
+  const url = new URL(request.url);
 
   if (url.origin !== self.location.origin) return;
 
-  if (req.mode === "navigate") {
+  if (request.mode === "navigate") {
     event.respondWith(
-      fetch(req).catch(async () =>
-        (await caches.match(req)) ||
-        (await caches.match("./index.html")) ||
-        (await caches.match("./"))
-      )
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+
+        const cachedPage =
+          await cache.match(request) ||
+          await cache.match(BASE_URL) ||
+          await cache.match(BASE_URL + "index.html");
+
+        if (cachedPage) return cachedPage;
+
+        return fetch(request);
+      })()
     );
+
     return;
   }
 
   event.respondWith(
-    caches.match(req).then(cached =>
-      cached || fetch(req)
-    )
+    (async () => {
+      const cached = await caches.match(request);
+
+      if (cached) return cached;
+
+      return fetch(request);
+    })()
   );
 });
